@@ -6,7 +6,6 @@
 
   const nativeOpen = window.open.bind(window);
   const INTENT_TTL_MS = 2_000;
-  let enabled = true;
   let trustedDestination = "";
   let trustedUntil = 0;
 
@@ -34,7 +33,6 @@
     const destination = core.normalizeDestination(anchor.href, location.href);
     trustedDestination = destination;
     trustedUntil = Date.now() + INTENT_TTL_MS;
-    report("navigation-intent", destination);
   }
 
   function guardedOpen(url, target, features) {
@@ -43,7 +41,6 @@
       baseUrl: location.href,
       currentOrigin: location.origin,
       destination,
-      enabled,
       trustedDestination,
       trustedUntil,
     });
@@ -68,7 +65,7 @@
   });
 
   addEventListener("pointerdown", (event) => {
-    if (!enabled || !event.isTrusted || event.button !== 0) {
+    if (!event.isTrusted || event.button !== 0) {
       return;
     }
     const anchor = event.target instanceof Element ? event.target.closest("a[href]") : null;
@@ -78,7 +75,7 @@
   }, true);
 
   addEventListener("click", (event) => {
-    if (!enabled || !(event.target instanceof Element)) {
+    if (!(event.target instanceof Element)) {
       return;
     }
 
@@ -101,7 +98,7 @@
   }, true);
 
   addEventListener("submit", (event) => {
-    if (!enabled || !(event.target instanceof HTMLFormElement)) {
+    if (!(event.target instanceof HTMLFormElement)) {
       return;
     }
     const destination = core.normalizeDestination(event.target.action, location.href);
@@ -112,7 +109,4 @@
     }
   }, true);
 
-  addEventListener("__noredirect_config__", (event) => {
-    enabled = event.detail?.enabled !== false;
-  });
 })();

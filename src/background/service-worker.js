@@ -47,7 +47,7 @@ function recordProtectionEvent(event, tabId) {
 void getSettings().then((settings) => {
   settingsCache = settings;
   void applyNetworkProtection(settings.enabled);
-  void registerProtectionScripts(settings.strictSites);
+  void registerProtectionScripts(settings.enabled ? settings.strictSites : []);
 });
 
 async function rememberOpenProtectedTabs() {
@@ -113,7 +113,7 @@ chrome.runtime.onInstalled.addListener(() => {
     settingsCache = settings;
     return Promise.all([
       applyNetworkProtection(settings.enabled),
-      registerProtectionScripts(settings.strictSites),
+      registerProtectionScripts(settings.enabled ? settings.strictSites : []),
     ]);
   });
 });
@@ -218,13 +218,14 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   if (changes.enabled) {
     settingsCache = { ...settingsCache, enabled: Boolean(changes.enabled.newValue) };
     void applyNetworkProtection(settingsCache.enabled);
+    void registerProtectionScripts(settingsCache.enabled ? settingsCache.strictSites : []);
   }
   if (changes.allowOnceTtlMs) {
     settingsCache = { ...settingsCache, allowOnceTtlMs: changes.allowOnceTtlMs.newValue };
   }
   if (changes.strictSites) {
     settingsCache = { ...settingsCache, strictSites: changes.strictSites.newValue };
-    void registerProtectionScripts(settingsCache.strictSites);
+    void registerProtectionScripts(settingsCache.enabled ? settingsCache.strictSites : []);
   }
 });
 
