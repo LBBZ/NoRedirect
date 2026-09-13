@@ -1,4 +1,4 @@
-import { readFile } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 
 const manifest = JSON.parse(await readFile(new URL("../manifest.json", import.meta.url)));
 const rules = JSON.parse(
@@ -7,6 +7,23 @@ const rules = JSON.parse(
 
 if (manifest.manifest_version !== 3) {
   throw new Error("Expected a Manifest V3 extension");
+}
+
+const referencedFiles = [
+  manifest.background?.service_worker,
+  manifest.action?.default_popup,
+  manifest.options_page,
+  ...manifest.declarative_net_request.rule_resources.map((resource) => resource.path),
+].filter(Boolean);
+
+for (const file of referencedFiles) {
+  await access(new URL(`../${file}`, import.meta.url));
+}
+
+if (!manifest.permissions.includes("declarativeNetRequest") ||
+    !manifest.permissions.includes("webNavigation") ||
+    !manifest.permissions.includes("tabs")) {
+  throw new Error("Required protection permissions are missing");
 }
 
 const ids = new Set();
@@ -20,4 +37,6 @@ for (const rule of rules) {
   }
 }
 
-console.log(`Validated manifest and ${rules.length} network rules`);
+console.log(
+  `Validated manifest, ${referencedFiles.length} referenced files, and ${rules.length} network rules`
+);
