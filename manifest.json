@@ -29,6 +29,15 @@
     "service_worker": "src/background/service-worker.js",
     "type": "module"
   },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "network_protection",
+        "enabled": true,
+        "path": "rules/network-protection.json"
+      }
+    ]
+  },
   "action": {
     "default_title": "NoRedirect"
   }
