@@ -1,8 +1,4 @@
 (() => {
-  if (window.top !== window) {
-    return;
-  }
-
   function safeDestination(value) {
     try {
       const parsed = new URL(value, location.href);

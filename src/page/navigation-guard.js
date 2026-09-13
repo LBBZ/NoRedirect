@@ -1,6 +1,6 @@
 (() => {
   const core = globalThis.NoRedirectNavigationCore;
-  if (!core || window.top !== window) {
+  if (!core) {
     return;
   }
 
