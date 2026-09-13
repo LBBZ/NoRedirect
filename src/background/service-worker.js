@@ -9,14 +9,43 @@ import {
   intentMatches,
   makeIntent,
 } from "./tab-policy.js";
+import { appendEvent, sanitizeProtectionEvent } from "./event-log.js";
 
 const navigationIntents = new Map();
 const childTargets = new Map();
 const lastSafeUrls = new Map();
+const tabBlockCounts = new Map();
 let settingsCache = DEFAULT_SETTINGS;
+let eventWriteQueue = Promise.resolve();
+
+async function applyNetworkProtection(enabled) {
+  await chrome.declarativeNetRequest.updateEnabledRulesets({
+    disableRulesetIds: enabled ? [] : ["network_protection"],
+    enableRulesetIds: enabled ? ["network_protection"] : [],
+  });
+}
+
+function recordProtectionEvent(event, tabId) {
+  const sanitized = sanitizeProtectionEvent(event, tabId);
+  eventWriteQueue = eventWriteQueue.then(async () => {
+    const stored = await chrome.storage.local.get({ blockedCount: 0, eventLog: [] });
+    await chrome.storage.local.set({
+      blockedCount: stored.blockedCount + 1,
+      eventLog: appendEvent(stored.eventLog, sanitized),
+    });
+  });
+
+  if (tabId >= 0) {
+    const count = (tabBlockCounts.get(tabId) ?? 0) + 1;
+    tabBlockCounts.set(tabId, count);
+    void chrome.action.setBadgeBackgroundColor({ color: "#B42318", tabId });
+    void chrome.action.setBadgeText({ text: count > 99 ? "99+" : String(count), tabId });
+  }
+}
 
 void getSettings().then((settings) => {
   settingsCache = settings;
+  void applyNetworkProtection(settings.enabled);
 });
 
 async function rememberOpenProtectedTabs() {
@@ -29,8 +58,13 @@ async function rememberOpenProtectedTabs() {
   }
 }
 
-async function closeTab(tabId) {
+async function closeTab(tabId, sourceTabId, destination) {
   childTargets.delete(tabId);
+  recordProtectionEvent({
+    destination,
+    hostname: "",
+    kind: "child-tab-blocked",
+  }, sourceTabId);
   await chrome.tabs.remove(tabId).catch(() => {});
 }
 
@@ -59,7 +93,7 @@ async function evaluateChildTarget(tabId) {
   });
 
   if (decision === "close") {
-    await closeTab(tabId);
+    await closeTab(tabId, sourceTabId, destination);
   } else if (decision === "allow-intent") {
     navigationIntents.delete(sourceTabId);
     childTargets.delete(tabId);
@@ -73,7 +107,10 @@ function watchChildTarget(sourceTabId, targetTabId) {
 }
 
 chrome.runtime.onInstalled.addListener(() => {
-  void initializeSettings();
+  void initializeSettings().then(() => getSettings()).then((settings) => {
+    settingsCache = settings;
+    return applyNetworkProtection(settings.enabled);
+  });
 });
 
 chrome.runtime.onStartup.addListener(() => {
@@ -93,8 +130,18 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         sender.tab.id,
         makeIntent(message.event.destination, settingsCache.allowOnceTtlMs)
       );
+    } else {
+      recordProtectionEvent(message.event, sender.tab.id);
     }
     return false;
+  }
+
+  if (message?.type === "activity:clear") {
+    tabBlockCounts.clear();
+    void chrome.tabs.query({}).then((tabs) => Promise.all(tabs.map((tab) =>
+      tab.id === undefined ? Promise.resolve() : chrome.action.setBadgeText({ text: "", tabId: tab.id })
+    ))).then(() => chrome.storage.local.set({ blockedCount: 0, eventLog: [] })).then(sendResponse);
+    return true;
   }
 
   return false;
@@ -127,6 +174,7 @@ chrome.tabs.onRemoved.addListener((tabId) => {
   childTargets.delete(tabId);
   lastSafeUrls.delete(tabId);
   navigationIntents.delete(tabId);
+  tabBlockCounts.delete(tabId);
 });
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
@@ -148,9 +196,27 @@ chrome.webNavigation.onBeforeNavigate.addListener((details) => {
 
     const safeUrl = lastSafeUrls.get(details.tabId);
     if (safeUrl) {
+      recordProtectionEvent({
+        destination: details.url,
+        hostname: new URL(safeUrl).hostname,
+        kind: "top-level-navigation-blocked",
+      }, details.tabId);
       await chrome.tabs.update(details.tabId, { url: safeUrl }).catch(() => {});
     }
   });
+});
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== "local") {
+    return;
+  }
+  if (changes.enabled) {
+    settingsCache = { ...settingsCache, enabled: Boolean(changes.enabled.newValue) };
+    void applyNetworkProtection(settingsCache.enabled);
+  }
+  if (changes.allowOnceTtlMs) {
+    settingsCache = { ...settingsCache, allowOnceTtlMs: changes.allowOnceTtlMs.newValue };
+  }
 });
 
 void rememberOpenProtectedTabs();

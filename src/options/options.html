@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NoRedirect 设置</title>
+    <link rel="stylesheet" href="options.css">
+  </head>
+  <body>
+    <main>
+      <header>
+        <p class="eyebrow">NOREDIRECT</p>
+        <h1>浏览器跳转保护</h1>
+        <p class="subtitle">在请求、页面和标签页三个阶段拦截未经授权的跳转。</p>
+      </header>
+
+      <section class="card setting-row">
+        <div>
+          <h2>启用保护</h2>
+          <p>切换后请刷新已经打开的受保护页面。</p>
+        </div>
+        <label class="switch">
+          <input id="enabled" type="checkbox">
+          <span aria-hidden="true"></span>
+          <span class="sr-only">启用保护</span>
+        </label>
+      </section>
+
+      <section class="card">
+        <div class="activity-heading">
+          <div>
+            <p class="eyebrow">ACTIVITY</p>
+            <h2><span id="blocked-count">0</span> 次拦截</h2>
+          </div>
+          <button id="clear" type="button">清空记录</button>
+        </div>
+        <p class="privacy">仅记录事件类型和域名，不保存完整网址、查询参数或页面内容。</p>
+        <ol id="events" class="events"></ol>
+        <p id="empty" class="empty">暂时没有拦截记录。</p>
+      </section>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

@@ -11,6 +11,8 @@
   };
   let enabled = true;
   let observer;
+  let started = false;
+  let resizeBound = false;
 
   function frameOrigin(frame) {
     const source = frame.getAttribute("src") ?? "";
@@ -85,27 +87,43 @@
   }
 
   function start() {
-    if (document.body) {
+    if (!started && document.body) {
       originalDocumentStyle.bodyOverflow = document.body.style.overflow;
       originalDocumentStyle.bodyPointerEvents = document.body.style.pointerEvents;
     }
+    started = true;
     scan();
-    observer = new MutationObserver((mutations) => {
-      for (const mutation of mutations) {
-        mutation.addedNodes.forEach((node) => {
-          if (node instanceof Element) {
-            scan(node);
-          }
-        });
-      }
-    });
+    observer ??= new MutationObserver((mutations) => {
+        for (const mutation of mutations) {
+          mutation.addedNodes.forEach((node) => {
+            if (node instanceof Element) {
+              scan(node);
+            }
+          });
+        }
+      });
     observer.observe(document.documentElement, { childList: true, subtree: true });
-    addEventListener("resize", () => scan(), { passive: true });
+    if (!resizeBound) {
+      resizeBound = true;
+      addEventListener("resize", () => scan(), { passive: true });
+    }
   }
 
   chrome.storage.local.get({ enabled: true }).then(({ enabled: configured }) => {
     enabled = Boolean(configured);
     if (!enabled) {
+      observer?.disconnect();
+    }
+  });
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName !== "local" || !changes.enabled) {
+      return;
+    }
+    enabled = Boolean(changes.enabled.newValue);
+    if (enabled) {
+      start();
+    } else {
       observer?.disconnect();
     }
   });

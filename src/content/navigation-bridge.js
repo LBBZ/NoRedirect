@@ -38,4 +38,12 @@
       detail: { enabled: Boolean(enabled) },
     }));
   });
+
+  chrome.storage.onChanged.addListener((changes, areaName) => {
+    if (areaName === "local" && changes.enabled) {
+      dispatchEvent(new CustomEvent("__noredirect_config__", {
+        detail: { enabled: Boolean(changes.enabled.newValue) },
+      }));
+    }
+  });
 })();
