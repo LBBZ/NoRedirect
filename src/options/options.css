@@ -121,6 +121,51 @@ button:hover {
   color: #9a3412;
 }
 
+.site-form {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.site-form input {
+  min-width: 0;
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #c9c2b4;
+  border-radius: 9px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+}
+
+.site-form input:focus {
+  border-color: #18794e;
+  outline: 3px solid rgba(24, 121, 78, .14);
+}
+
+.sites {
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sites li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-top: 1px solid #e3ded4;
+}
+
+.sites code {
+  color: #173f2c;
+}
+
+.error {
+  margin: 10px 0 0;
+  color: #b42318;
+}
+
 .events {
   margin: 20px 0 0;
   padding: 0;
@@ -156,5 +201,10 @@ button:hover {
   .events li {
     grid-template-columns: 1fr;
     gap: 4px;
+  }
+
+  .site-form {
+    align-items: stretch;
+    flex-direction: column;
   }
 }

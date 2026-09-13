@@ -10,6 +10,7 @@ import {
   makeIntent,
 } from "./tab-policy.js";
 import { appendEvent, sanitizeProtectionEvent } from "./event-log.js";
+import { registerProtectionScripts } from "./content-registration.js";
 
 const navigationIntents = new Map();
 const childTargets = new Map();
@@ -46,6 +47,7 @@ function recordProtectionEvent(event, tabId) {
 void getSettings().then((settings) => {
   settingsCache = settings;
   void applyNetworkProtection(settings.enabled);
+  void registerProtectionScripts(settings.strictSites);
 });
 
 async function rememberOpenProtectedTabs() {
@@ -109,7 +111,10 @@ function watchChildTarget(sourceTabId, targetTabId) {
 chrome.runtime.onInstalled.addListener(() => {
   void initializeSettings().then(() => getSettings()).then((settings) => {
     settingsCache = settings;
-    return applyNetworkProtection(settings.enabled);
+    return Promise.all([
+      applyNetworkProtection(settings.enabled),
+      registerProtectionScripts(settings.strictSites),
+    ]);
   });
 });
 
@@ -216,6 +221,10 @@ chrome.storage.onChanged.addListener((changes, areaName) => {
   }
   if (changes.allowOnceTtlMs) {
     settingsCache = { ...settingsCache, allowOnceTtlMs: changes.allowOnceTtlMs.newValue };
+  }
+  if (changes.strictSites) {
+    settingsCache = { ...settingsCache, strictSites: changes.strictSites.newValue };
+    void registerProtectionScripts(settingsCache.strictSites);
   }
 });
 

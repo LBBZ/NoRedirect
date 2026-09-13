@@ -27,6 +27,18 @@
       </section>
 
       <section class="card">
+        <p class="eyebrow">PROTECTED SITES</p>
+        <h2>严格保护站点</h2>
+        <p class="privacy">默认不预设站点，请添加需要保护的域名并授权。页面及跳转保护仅在列出的 HTTPS 站点运行；已知广告域名拦截在启用保护时全局生效。</p>
+        <form id="site-form" class="site-form">
+          <input id="site-input" type="text" inputmode="url" autocomplete="off" placeholder="example.com" aria-label="站点域名">
+          <button type="submit">添加站点</button>
+        </form>
+        <p id="site-error" class="error" role="alert" hidden></p>
+        <ul id="sites" class="sites"></ul>
+      </section>
+
+      <section class="card">
         <div class="activity-heading">
           <div>
             <p class="eyebrow">ACTIVITY</p>
