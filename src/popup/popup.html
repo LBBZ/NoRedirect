@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NoRedirect</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main>
+      <div class="brand">
+        <span class="mark" aria-hidden="true">N</span>
+        <div>
+          <h1>NoRedirect</h1>
+          <p id="status">正在读取状态…</p>
+        </div>
+      </div>
+
+      <section class="count">
+        <strong id="blocked-count">0</strong>
+        <span>累计拦截</span>
+      </section>
+
+      <label class="control">
+        <span>启用保护</span>
+        <input id="enabled" type="checkbox">
+      </label>
+
+      <button id="options" type="button">查看活动与设置</button>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

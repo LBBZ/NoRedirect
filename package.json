@@ -1,0 +1,10 @@
+{
+  "name": "no-redirect-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node scripts/validate-extension.mjs && node --test",
+    "smoke:chrome": "node scripts/chrome-smoke.mjs"
+  }
+}

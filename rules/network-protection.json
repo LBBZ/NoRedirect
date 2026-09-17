@@ -1,0 +1,43 @@
+[
+  {
+    "id": 1,
+    "priority": 100,
+    "action": {
+      "type": "block"
+    },
+    "condition": {
+      "requestDomains": [
+        "chaseherbalpasty.com",
+        "displayvertising.com",
+        "wpadmngr.com",
+        "adsco.re",
+        "nawpush.com",
+        "capndr.com",
+        "wpushsdk.com",
+        "bookmsg.com",
+        "goodimpressioncrboost.com",
+        "avalanchetremorunfilled.com",
+        "drabimprovement.com",
+        "zhhlbgtwrulfi.com",
+        "queniuqe.com"
+      ],
+      "resourceTypes": [
+        "main_frame",
+        "sub_frame",
+        "stylesheet",
+        "script",
+        "image",
+        "font",
+        "object",
+        "xmlhttprequest",
+        "ping",
+        "csp_report",
+        "media",
+        "websocket",
+        "webtransport",
+        "webbundle",
+        "other"
+      ]
+    }
+  }
+]

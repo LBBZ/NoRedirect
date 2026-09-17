@@ -1,0 +1,97 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, "Segoe UI", system-ui, sans-serif;
+  color: #18231d;
+  background: #f4f1e9;
+}
+
+body {
+  width: 300px;
+  margin: 0;
+}
+
+main {
+  padding: 20px;
+}
+
+.brand,
+.control {
+  display: flex;
+  align-items: center;
+}
+
+.brand {
+  gap: 12px;
+}
+
+.mark {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: 12px;
+  background: #173f2c;
+  color: #f7f3e9;
+  font: 700 22px/1 Georgia, serif;
+}
+
+h1,
+p {
+  margin: 0;
+}
+
+h1 {
+  font-size: 18px;
+}
+
+#status {
+  margin-top: 3px;
+  color: #687169;
+  font-size: 12px;
+}
+
+.count {
+  margin: 18px 0;
+  padding: 16px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgba(40, 35, 25, .06);
+}
+
+.count strong {
+  display: block;
+  color: #9a3412;
+  font: 700 32px/1 Georgia, serif;
+}
+
+.count span {
+  color: #687169;
+  font-size: 12px;
+}
+
+.control {
+  justify-content: space-between;
+  padding: 4px 0 18px;
+  font-weight: 650;
+}
+
+.control input {
+  width: 20px;
+  height: 20px;
+  accent-color: #18794e;
+}
+
+button {
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 10px;
+  background: #173f2c;
+  color: white;
+  cursor: pointer;
+  font: 650 13px/1.2 inherit;
+}
+
+button:hover {
+  background: #245a40;
+}

@@ -1,0 +1,8 @@
+.chrome-cdp-profile/
+.o11y/
+.o11y-tools/
+.test-chrome-profile*/
+_metadata/
+node_modules/
+coverage/
+*.log

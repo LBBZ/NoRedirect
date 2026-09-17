@@ -1,0 +1,49 @@
+{
+  "manifest_version": 3,
+  "name": "NoRedirect",
+  "version": "0.1.0",
+  "description": "Blocks deceptive overlays and unauthorized browser redirects.",
+  "permissions": [
+    "declarativeNetRequest",
+    "scripting",
+    "storage",
+    "tabs",
+    "webNavigation"
+  ],
+  "host_permissions": [
+    "*://*.chaseherbalpasty.com/*",
+    "*://*.displayvertising.com/*",
+    "*://*.wpadmngr.com/*",
+    "*://*.adsco.re/*",
+    "*://*.nawpush.com/*",
+    "*://*.capndr.com/*",
+    "*://*.wpushsdk.com/*",
+    "*://*.bookmsg.com/*",
+    "*://*.goodimpressioncrboost.com/*",
+    "*://*.avalanchetremorunfilled.com/*",
+    "*://*.drabimprovement.com/*",
+    "*://*.zhhlbgtwrulfi.com/*",
+    "*://*.queniuqe.com/*"
+  ],
+  "optional_host_permissions": [
+    "https://*/*"
+  ],
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "declarative_net_request": {
+    "rule_resources": [
+      {
+        "id": "network_protection",
+        "enabled": true,
+        "path": "rules/network-protection.json"
+      }
+    ]
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "NoRedirect"
+  },
+  "options_page": "src/options/options.html"
+}
