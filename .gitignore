@@ -5,4 +5,5 @@
 _metadata/
 node_modules/
 coverage/
+dist/
 *.log

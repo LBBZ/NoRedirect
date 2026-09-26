@@ -17,6 +17,25 @@ Load this directory through `chrome://extensions` with Developer mode enabled an
 
 Use the toolbar popup for the master switch and open the settings page to inspect activity or add HTTPS sites for protection. The protected-site list starts empty; users choose and authorize each site themselves. Page and navigation protection apply to those sites, while the advertising-domain blocklist applies globally when protection is enabled. Existing pages must be refreshed after loading the extension or changing protection state.
 
+## Packaging
+
+On Windows, with Node.js/npm and Windows PowerShell installed, run:
+
+```powershell
+npm run package
+```
+
+This runs static validation and unit tests before creating
+`dist/NoRedirect-v<version>.zip` and a matching `.zip.sha256` checksum file.
+The version comes from `manifest.json`. The ZIP contains only `manifest.json`,
+`src/`, and `rules/` from the current working tree, including uncommitted changes.
+It excludes Git history, browser profiles, tests, and development scripts.
+Repeated runs replace the package and checksum for the same version.
+
+Upload the ZIP and checksum as GitHub Release assets. To install locally,
+extract the ZIP and select its directory using **Load unpacked** in the browser's
+extensions page with Developer mode enabled. The command does not publish a release.
+
 ## Verification
 
 Run static validation and unit tests:

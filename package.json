@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "check": "node scripts/validate-extension.mjs && node --test",
+    "package": "npm run check && powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-extension.ps1",
     "smoke:chrome": "node scripts/chrome-smoke.mjs"
   }
 }
