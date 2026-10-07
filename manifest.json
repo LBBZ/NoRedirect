@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "NoRedirect",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Blocks deceptive overlays and unauthorized browser redirects.",
   "permissions": [
     "declarativeNetRequest",

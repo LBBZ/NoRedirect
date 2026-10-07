@@ -7,6 +7,7 @@ import {
 import {
   decideChildNavigation,
   intentMatches,
+  isBrowserPage,
   makeIntent,
 } from "./tab-policy.js";
 import { appendEvent, sanitizeProtectionEvent } from "./event-log.js";
@@ -81,6 +82,8 @@ async function evaluateChildTarget(tabId) {
     chrome.tabs.get(sourceTabId).catch(() => null),
     chrome.tabs.get(tabId).catch(() => null),
   ]);
+  // Another evaluation may have released this target while these reads awaited.
+  if (childTargets.get(tabId) !== sourceTabId) return;
   if (!settings.enabled || !sourceTab || !targetTab ||
       !isProtectedUrl(sourceTab.url, settings.strictSites)) {
     childTargets.delete(tabId);
@@ -98,6 +101,8 @@ async function evaluateChildTarget(tabId) {
     await closeTab(tabId, sourceTabId, destination);
   } else if (decision === "allow-intent") {
     navigationIntents.delete(sourceTabId);
+    childTargets.delete(tabId);
+  } else if (decision === "allow-browser") {
     childTargets.delete(tabId);
   }
 }
@@ -183,6 +188,13 @@ chrome.tabs.onRemoved.addListener((tabId) => {
 });
 
 chrome.webNavigation.onBeforeNavigate.addListener((details) => {
+  if (details.frameId === 0 && isBrowserPage(details.url)) {
+    // Explicitly leaving a protected site for browser UI ends its navigation guard.
+    childTargets.delete(details.tabId);
+    lastSafeUrls.delete(details.tabId);
+    navigationIntents.delete(details.tabId);
+    return;
+  }
   if (details.frameId !== 0 || !lastSafeUrls.has(details.tabId)) {
     return;
   }

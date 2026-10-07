@@ -5,10 +5,31 @@ import {
   comparableUrl,
   decideChildNavigation,
   intentMatches,
+  isBrowserPage,
   makeIntent,
 } from "../src/background/tab-policy.js";
 
 const strictSites = ["reader.example.test"];
+
+test("allows browser new tabs, settings and extension pages", () => {
+  for (const destination of ["chrome://newtab/", "chrome://extensions/", "chrome://settings/", "chrome-search://local-ntp/local-ntp.html", "chrome-extension://abcdefghijklmnop/options.html"]) {
+    assert.equal(isBrowserPage(destination), true);
+    assert.equal(decideChildNavigation({ destination, strictSites }), "allow-browser");
+  }
+});
+
+test("browser-like hostnames and unsafe protocols do not bypass protection", () => {
+  for (const destination of ["https://newtab/", "https://chrome.example/", "javascript:alert(1)", "data:text/html,test", "not a url", "chrome:"]) {
+    assert.equal(isBrowserPage(destination), false);
+    assert.equal(decideChildNavigation({ destination, strictSites }), "close");
+  }
+});
+
+test("blank popup remains watched and its later external destination is blocked", () => {
+  assert.equal(decideChildNavigation({ destination: "", strictSites }), "watch");
+  assert.equal(decideChildNavigation({ destination: "about:blank", strictSites }), "watch");
+  assert.equal(decideChildNavigation({ destination: "https://ads.example.test/", strictSites }), "close");
+});
 
 test("watches blank child targets for delayed navigation", () => {
   assert.equal(decideChildNavigation({ destination: "about:blank", strictSites }), "watch");
