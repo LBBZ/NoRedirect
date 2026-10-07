@@ -31,11 +31,15 @@
       titledAsOffer
     );
 
-    return areaRatio >= MINIMUM_AREA_RATIO &&
+    const notificationAd = Boolean(metrics.opaqueSource && metrics.adLabel &&
+      metrics.externalImage && metrics.notificationActions);
+    return (areaRatio > 0 && fixed && interceptsClicks &&
+      zIndex >= SUSPICIOUS_Z_INDEX && notificationAd) ||
+      (areaRatio >= MINIMUM_AREA_RATIO &&
       fixed &&
       interceptsClicks &&
       suspiciousFrame &&
-      (zIndex >= SUSPICIOUS_Z_INDEX || titledAsOffer);
+      (zIndex >= SUSPICIOUS_Z_INDEX || titledAsOffer));
   }
 
   root.NoRedirectOverlayCore = Object.freeze({

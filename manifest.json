@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "NoRedirect",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Blocks deceptive overlays and unauthorized browser redirects.",
   "permissions": [
     "declarativeNetRequest",
@@ -11,6 +11,7 @@
     "webNavigation"
   ],
   "host_permissions": [
+    "*://*.darnobedienceupscale.com/*",
     "*://*.chaseherbalpasty.com/*",
     "*://*.displayvertising.com/*",
     "*://*.wpadmngr.com/*",

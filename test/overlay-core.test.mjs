@@ -47,3 +47,17 @@ test("detects popup sandbox capabilities", () => {
   assert.equal(core.hasDangerousSandbox("allow-scripts allow-popups"), true);
   assert.equal(core.hasDangerousSandbox("allow-scripts allow-forms"), false);
 });
+
+const notificationAd = { areaRatio: 0.08, position: "fixed", pointerEvents: "auto", zIndex: "2147483647",
+  opaqueSource: true, adLabel: true, externalImage: true, notificationActions: true };
+test("removes small explicitly marked notification ads", () => {
+  assert.equal(Boolean(core.shouldRemoveOverlay(notificationAd)), true);
+});
+test("keeps small panels without the combined advertising evidence", () => {
+  for (const key of ["opaqueSource", "adLabel", "externalImage", "notificationActions"]) {
+    assert.equal(Boolean(core.shouldRemoveOverlay({ ...notificationAd, [key]: false })), false);
+  }
+  assert.equal(Boolean(core.shouldRemoveOverlay({ ...notificationAd, position: "static" })), false);
+  assert.equal(Boolean(core.shouldRemoveOverlay({ ...notificationAd, pointerEvents: "none" })), false);
+  assert.equal(Boolean(core.shouldRemoveOverlay({ ...notificationAd, areaRatio: 0 })), false);
+});
